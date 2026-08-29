@@ -1,0 +1,29 @@
+# Node
+node_modules/
+dist/
+dist-ssr/
+*.local
+npm-debug.log*
+
+# Rust / Tauri
+src-tauri/target/
+
+# Local data (never commit real financial data or DB files)
+*.sqlite
+*.sqlite3
+*.db
+*.simplefin
+
+# Env / secrets
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp

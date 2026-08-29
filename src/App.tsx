@@ -3,11 +3,23 @@ import "./App.css";
 import { profileExists } from "./features/authentication/api";
 import CreateProfileScreen from "./features/authentication/CreateProfileScreen";
 import LoginScreen from "./features/authentication/LoginScreen";
+import Sidebar from "./components/Sidebar";
+import ComingSoon from "./components/ComingSoon";
+import DashboardScreen from "./features/dashboard/DashboardScreen";
 
-type Screen = "loading" | "create" | "login" | "authenticated";
+type Screen = "loading" | "create" | "login" | "app";
+
+const SECTION_TITLES: Record<string, string> = {
+  finances: "Finances",
+  investments: "Investments",
+  analytics: "Analytics",
+  forecast: "Forecast",
+  settings: "Settings",
+};
 
 function App() {
   const [screen, setScreen] = useState<Screen>("loading");
+  const [activeSection, setActiveSection] = useState("overview");
 
   useEffect(() => {
     profileExists()
@@ -20,19 +32,28 @@ function App() {
   }
 
   if (screen === "create") {
-    return <CreateProfileScreen onCreated={() => setScreen("authenticated")} />;
+    return <CreateProfileScreen onCreated={() => setScreen("app")} />;
   }
 
   if (screen === "login") {
-    return <LoginScreen onUnlocked={() => setScreen("authenticated")} />;
+    return <LoginScreen onUnlocked={() => setScreen("app")} />;
   }
 
   return (
-    <main className="min-h-screen bg-background flex items-center justify-center">
-      <p className="font-display text-xl text-foreground">
-        Welcome to Simple Fin — Dashboard coming next.
-      </p>
-    </main>
+    <div className="h-screen flex bg-background">
+      <Sidebar
+        active={activeSection}
+        onSelect={setActiveSection}
+        onLock={() => setScreen("login")}
+      />
+      <main className="flex-1 overflow-hidden">
+        {activeSection === "overview" ? (
+          <DashboardScreen />
+        ) : (
+          <ComingSoon title={SECTION_TITLES[activeSection] ?? activeSection} />
+        )}
+      </main>
+    </div>
   );
 }
 

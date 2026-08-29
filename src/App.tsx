@@ -1,49 +1,37 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
+import { useEffect, useState } from "react";
 import "./App.css";
+import { profileExists } from "./features/authentication/api";
+import CreateProfileScreen from "./features/authentication/CreateProfileScreen";
+import LoginScreen from "./features/authentication/LoginScreen";
+
+type Screen = "loading" | "create" | "login" | "authenticated";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [screen, setScreen] = useState<Screen>("loading");
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
+  useEffect(() => {
+    profileExists()
+      .then((exists) => setScreen(exists ? "login" : "create"))
+      .catch(() => setScreen("create"));
+  }, []);
+
+  if (screen === "loading") {
+    return <main className="min-h-screen bg-background" />;
+  }
+
+  if (screen === "create") {
+    return <CreateProfileScreen onCreated={() => setScreen("authenticated")} />;
+  }
+
+  if (screen === "login") {
+    return <LoginScreen onUnlocked={() => setScreen("authenticated")} />;
   }
 
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
+    <main className="min-h-screen bg-background flex items-center justify-center">
+      <p className="font-display text-xl text-foreground">
+        Welcome to Simple Fin — Dashboard coming next.
+      </p>
     </main>
   );
 }

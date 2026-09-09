@@ -6,6 +6,7 @@ import LoginScreen from "./features/authentication/LoginScreen";
 import Sidebar from "./components/Sidebar";
 import ComingSoon from "./components/ComingSoon";
 import DashboardScreen from "./features/dashboard/DashboardScreen";
+import FinancesScreen from "./features/finances/FinancesScreen";
 
 type Screen = "loading" | "create" | "login" | "app";
 
@@ -49,6 +50,8 @@ function App() {
       <main className="flex-1 overflow-hidden">
         {activeSection === "overview" ? (
           <DashboardScreen />
+        ) : activeSection === "finances" ? (
+          <FinancesScreen />
         ) : (
           <ComingSoon title={SECTION_TITLES[activeSection] ?? activeSection} />
         )}

@@ -36,3 +36,15 @@ export function createProfile(profile: NewProfile): Promise<void> {
 export function login(password: string): Promise<boolean> {
   return invoke("login", { password });
 }
+
+export interface ProfileSettings {
+  baseCurrency: string;
+  locale: string;
+}
+
+export function getProfileSettings(): Promise<ProfileSettings> {
+  return invoke<{ base_currency: string; locale: string }>("get_profile_settings").then((r) => ({
+    baseCurrency: r.base_currency,
+    locale: r.locale,
+  }));
+}

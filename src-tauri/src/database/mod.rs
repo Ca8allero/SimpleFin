@@ -16,11 +16,35 @@ pub fn db_path(app_data_dir: &Path) -> PathBuf {
     app_data_dir.join(DB_FILE_NAME)
 }
 
+const DEFAULT_INCOME_CATEGORIES: &[&str] =
+    &["Salario", "Freelance", "Bonificación", "Ingreso adicional", "Otros"];
+const DEFAULT_EXPENSE_CATEGORIES: &[&str] = &[
+    "Vivienda", "Transporte", "Alimentación", "Servicios", "Deudas",
+    "Educación", "Entretenimiento", "Suscripciones", "Otros",
+];
+
+fn seed_default_categories(conn: &Connection) -> Result<(), DbError> {
+    for name in DEFAULT_INCOME_CATEGORIES {
+        conn.execute(
+            "INSERT OR IGNORE INTO categories (name, kind, is_default) VALUES (?1, 'income', 1)",
+            [name],
+        )?;
+    }
+    for name in DEFAULT_EXPENSE_CATEGORIES {
+        conn.execute(
+            "INSERT OR IGNORE INTO categories (name, kind, is_default) VALUES (?1, 'expense', 1)",
+            [name],
+        )?;
+    }
+    Ok(())
+}
+
 pub fn open(app_data_dir: &Path) -> Result<Connection, DbError> {
     std::fs::create_dir_all(app_data_dir)?;
     let conn = Connection::open(db_path(app_data_dir))?;
     conn.pragma_update(None, "foreign_keys", "ON")?;
     conn.execute_batch(SCHEMA)?;
+    seed_default_categories(&conn)?;
     Ok(conn)
 }
 
